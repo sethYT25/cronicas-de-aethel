@@ -1,0 +1,55 @@
+# Flujo de publicación en GitHub Pages
+#
+# Para activarlo: ajustes del repositorio → Pages → origen "GitHub Actions".
+# A partir de ahí, cada envío a la rama principal comprueba el motor y publica
+# el juego. El sitio es solo index.html y la carpeta js.
+#
+# Copia este archivo a .github/workflows/pages.yml si prefieres que se ejecute
+# en cada envío. Se deja aquí porque crear flujos de trabajo requiere permisos
+# de administración sobre el repositorio.
+name: Publicar en GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Comprobar el motor
+        run: node tests/harness.js
+
+      - name: Preparar el sitio
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r js _site/js
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir el sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Desplegar
+        id: deployment
+        uses: actions/deploy-pages@v4
