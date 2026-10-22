@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crónicas de Aethel — Pruebas del motor</title>
+<style>
+  body{background:#0a0913; color:#e9e5f5; font-family:ui-monospace,Menlo,Consolas,monospace; padding:24px; font-size:13px; line-height:1.6;}
+  h1{font-size:18px; letter-spacing:.14em; color:#ffe9a8; margin-bottom:12px;}
+  #out{white-space:pre-wrap; border:1px solid #2e2850; border-radius:12px; padding:14px 18px; background:#0f0d1d;}
+  .ok{color:#7bffb2;} .ko{color:#ff8fa8; font-weight:700;} .head{color:#5aa9ff;}
+  .sum{margin-top:12px; font-size:16px;}
+</style>
+</head>
+<body>
+<h1>CRÓNICAS DE AETHEL — ARNÉS DE PRUEBAS</h1>
+<div id="out">Ejecutando...</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/engine.js"></script>
+<script src="../js/ui.js"></script>
+<script src="harness.js"></script>
+<script>
+  (function () {
+    const out = document.getElementById('out');
+    const lines = [];
+    let r;
+    try {
+      r = AethelTests.main(AethelEngine);
+    } catch (e) {
+      out.innerHTML = '<span class="ko">Fallo al ejecutar: ' + (e && e.message ? e.message : e) + '</span>';
+      return;
+    }
+    lines.push('<span class="head">Resultados por suite</span>');
+    for (const n of r.notes) {
+      const ko = n.indexOf('✗') === 0;
+      lines.push('<span class="' + (ko ? 'ko' : 'ok') + '">' + n + '</span>');
+    }
+    if (r.failures.length) {
+      lines.push('');
+      lines.push('<span class="head">Comprobaciones fallidas</span>');
+      for (const f of r.failures) lines.push('<span class="ko">✗ ' + f + '</span>');
+    }
+    lines.push('<div class="sum">PASA: <span class="ok">' + r.passed + '</span> &nbsp; FALLA: <span class="' + (r.failed ? 'ko' : 'ok') + '">' + r.failed + '</span></div>');
+    out.innerHTML = lines.join('\n');
+  })();
+</script>
+</body>
+</html>
