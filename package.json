@@ -1,0 +1,3 @@
+{ "name": "cronicas-de-aethel", "version": "1.0.0", "private": true, "description": "RPG por turnos en JavaScript puro, sin dependencias",
+  "scripts": { "test": "node tests/harness.js", "build": "node tools/build-single-file.js" },
+  "license": "MIT" }
